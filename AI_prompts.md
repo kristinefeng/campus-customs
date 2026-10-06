@@ -1,35 +1,35 @@
 # AI Prompts Log for Campus Customs HW4
 
-Document of all prompts given during HW4 development, with follow-ups where necessary.
+Complete record of all prompts given during HW4 development.
 
 ---
 
 ## Problem 1: Vibe Coder Prompts
 
-**Initial Prompt (Given):**
-"Set up this file with a template for all 13 problems. Each problem should have one section containing the actual prompt I give you, written in my own words, plus a follow-up prompt and explanation if a follow-up was necessary."
+**Prompt Given:**
+> "Set up this file with a template for all 13 problems. Each problem should have one section containing the actual prompt I give you, written in my own words, plus a follow-up prompt and explanation if a follow-up was necessary."
 
-**Status:** ✅ COMPLETE - Created AI_prompts.md template covering Problems 1-13
+**Status:** ✅ COMPLETE
 
 ---
 
 ## Problem 2: Analyze the Database
 
-**Initial Prompt (Given):**
-"Let's tackle problem 2: analyze the database"
+**Prompt Given:**
+> "Let's tackle problem 2: analyze the database"
 
 **What was needed:** Comprehensive database schema analysis and documentation
 
 **Follow-up:** Documented all tables (users, catalogue, inventory, chat_messages), field purposes, data types, and sample queries in output/harness.md
 
-**Status:** ✅ COMPLETE - harness.md created with full database schema
+**Status:** ✅ COMPLETE
 
 ---
 
 ## Problem 3: Build the Campus Customs Website
 
-**Initial Prompt (Given):**
-"Build the campus customs website with React frontend and FastAPI backend"
+**Prompt Given:**
+> "Build the campus customs website with React frontend and FastAPI backend"
 
 **What was accomplished:**
 - React + Vite + TypeScript frontend at localhost:5178
@@ -38,29 +38,26 @@ Document of all prompts given during HW4 development, with follow-ups where nece
 - Navigation between Home, Products, Login pages
 - Floating chat panel placeholder
 
-**Status:** ✅ COMPLETE - Full-stack web application scaffolded
+**Status:** ✅ COMPLETE
 
 ---
 
 ## Problem 4: Create Account and Login
 
-**Initial Prompt (Given):**
-"Let's start problem 4: create account and login"
+**Prompt Given:**
+> "Let's start problem 4: create account and login"
 
-**Requirements (from conversation):**
+**Explicit Requirements (from conversation):**
 - Store first name, last name, email, password
 - Implement registration with email validation
 - Implement login with password verification
 - Display logged-in user information
 - Provide logout functionality
 
-**Implementation:**
-- FastAPI /api/auth/register endpoint accepts first_name, last_name, email, password
-- Bcrypt password hashing with 12 rounds
-- /api/auth/login endpoint with secure token generation
-- Frontend login form with email and password fields
-- User email displayed in navbar when logged in
-- Logout clears session data
+**Follow-up Issues & Fixes:**
+- "The links above don't work for test existing user or create new account" → Fixed form links and routing
+- "The login information doesn't work" → Verified bcrypt hashing and database lookup
+- "I don't see a chat button" → Added floating chat widget to App.tsx
 
 **Status:** ✅ COMPLETE - Tested with sample user creation and login
 
@@ -68,8 +65,8 @@ Document of all prompts given during HW4 development, with follow-ups where nece
 
 ## Problem 5: PydanticAI Agent Backend
 
-**Initial Prompt (Given):**
-"Set up the PydanticAI agent backend with Claude model via Portkey gateway"
+**Prompt Given:**
+> "Set up the PydanticAI agent backend with Claude model via Portkey gateway"
 
 **What was needed:**
 - PydanticAI agent configuration with OpenAI/Portkey compatibility
@@ -84,14 +81,14 @@ Document of all prompts given during HW4 development, with follow-ups where nece
 - Agent registered to FastAPI /api/chat endpoint
 - Error handling and fallback responses
 
-**Status:** ✅ COMPLETE - Agent loads successfully and responds to messages
+**Status:** ✅ COMPLETE
 
 ---
 
 ## Problem 6: Product Info & Stock Tools
 
-**Initial Prompt (Given):**
-"Build database-backed tools that return REAL prices and inventory, not hallucinations"
+**Prompt Given:**
+> "Build database-backed tools that return REAL prices and inventory, not hallucinations"
 
 **What was needed:**
 - 4 database tools: search_catalog, get_product, check_availability, browse_popular
@@ -113,14 +110,19 @@ Document of all prompts given during HW4 development, with follow-ups where nece
 - ✅ Stock check specific size: Returns "8 in stock" for size L (real database value)
 - ✅ Search by keyword: Returns crew merchandise matching database search_tags
 
-**Status:** ✅ COMPLETE & TESTED - All tools working with real data
+**Status:** ✅ COMPLETE & TESTED
 
 ---
 
 ## Problem 7: Chat Search that Updates the Page
 
-**Initial Prompt (Given):**
-"Can you make it so when I ask 'do you have blue hoodies' it returns an image, price, and link to the hoodie?"
+**Prompt Given:**
+> "Can you make it so when I ask 'do you have blue hoodies' it returns an image, price, and link to the hoodie?"
+
+**Follow-up Issues:**
+- "It doesn't know what I mean" → Added context injection for product awareness
+- "The chat response is a little clunky. Can you fix it. Also add an option to be able to expand the chat screen" → Fixed chat panel layout and added maximize button
+- "The images aren't loading on the product page" → Fixed image paths and API endpoints
 
 **What was needed:**
 - Chat should return product objects (not just text)
@@ -136,17 +138,17 @@ Document of all prompts given during HW4 development, with follow-ups where nece
 - Product cards clickable to show detail view
 - Detail view shows full image, info, and size selector
 
-**Status:** ✅ COMPLETE - Chat search results display on Products page with clickable cards
+**Status:** ✅ COMPLETE
 
 ---
 
 ## Problem 8: Customer Memory & Chat History
 
-**Initial Prompt (Given):**
-"Build customer memory and chat history that persists for logged-in users"
+**Prompt Given:**
+> "Build customer memory and chat history that persists for logged-in users"
 
-**Detailed Requirement (from assignment):**
-"Guests can still chat, but history only needs to persist for logged-in users"
+**Explicit Requirement (from assignment):**
+> "Guests can still chat, but history only needs to persist for logged-in users"
 
 **What was needed:**
 - Chat history persistence in database for logged-in users
@@ -163,17 +165,20 @@ Document of all prompts given during HW4 development, with follow-ups where nece
 - Agent receives user_name, user_email, product context for personalization
 - Chat clears on logout
 
-**Status:** ✅ COMPLETE - Chat history persists for logged-in users; guests can chat without persistence
+**Status:** ✅ COMPLETE
 
 ---
 
 ## Problem 9: Usability Improvements
 
-**Initial Prompt (Given):**
-"OK let's start Problem 9: usability improvements. Choose and implement 2 frontend and 2 backend usability improvements."
+**Prompt Given:**
+> "OK let's start Problem 9: usability improvements."
 
-**Detailed Requirement (from conversation):**
-"For each improvement, say: what you added, why it helps a campus customs shopper or business... then make sure all improvements actually show up in the running app."
+**Detailed Prompt:**
+> "Now that the core shop works, improve it. Choose and implement: 2 front-end usability improvements, 2 agent/backend usability improvements. For each of the improvements, say: what you added, why it helps a campus customs shopper or business. Then make sure all improvements actually show up in the running app."
+
+**Follow-up Issue:**
+> "For test 3 (size selector) the screenshot has a size section, but the section is empty/doesn't show any available sizes. Can you update the app to include sizing and then update the screenshot afterwards to reflect the same"
 
 **Implemented Improvements:**
 
@@ -197,14 +202,14 @@ Document of all prompts given during HW4 development, with follow-ups where nece
 
 **Testing:** All 4 improvements verified in running app with screenshots
 
-**Status:** ✅ COMPLETE & TESTED - All improvements documented in output/usability.md
+**Status:** ✅ COMPLETE & TESTED
 
 ---
 
 ## Problem 10: Premium Design & Styling
 
-**Initial Prompt (Given):**
-"Now that the core shop works, design and style the website for a premium campus merchandise storefront feel"
+**Prompt Given:**
+> "Now that the core shop works, improve it. Choose and implement 2 frontend usability improvements, 2 agent/backend usability improvements and design and style the website for a premium campus merchandise storefront feel"
 
 **Design Implementation:**
 - Color system: Navy (#1a3a52), Red (#e74c3c), Gold (#f39c12)
@@ -220,14 +225,18 @@ Document of all prompts given during HW4 development, with follow-ups where nece
 - Higher conversion rates with premium feel
 - Better brand perception for Campus Customs
 
-**Status:** ✅ COMPLETE & TESTED - All design changes implemented and documented
+**Status:** ✅ COMPLETE & TESTED
 
 ---
 
 ## Problem 11: Test Application Comprehensively
 
-**Initial Prompt (Given):**
-"Test the live app comprehensively with screenshots and document results in HTML"
+**Prompt Given:**
+> "Test all frontend features based off of the prompts you've given me 1-8"
+
+**Follow-up Issues:**
+- "Can you catch mistakes like that on your own without me having to call it out?" → User requested end-to-end testing without pointing out bugs
+- "OK let me check the front end now, link?" → Provided access links
 
 **Testing Coverage:**
 1. **Chat Inventory Checking** - Agent answers "do you have X?" questions
@@ -240,14 +249,14 @@ Document of all prompts given during HW4 development, with follow-ups where nece
 - All images embedded as base64 (self-contained, no external files)
 - Comprehensive testing report ready for submission
 
-**Status:** ✅ COMPLETE - All 3 core features tested and documented with visual proof
+**Status:** ✅ COMPLETE
 
 ---
 
 ## Problem 12: Audit Trail, Safety, Finish Harness
 
-**Initial Prompt (Given):**
-"Great work. Now let's start Problem 12: audit trail, safety, finish harness"
+**Prompt Given:**
+> "Great work. Now let's start Problem 12: audit trail, safety, finish harness"
 
 **What was needed:**
 1. Append-only audit trail logging of agent tool usage
@@ -282,17 +291,17 @@ Document of all prompts given during HW4 development, with follow-ups where nece
   - Loop limits & specifications
   - Problems 1-12 checklist
 
-**Status:** ✅ COMPLETE - Audit trail logging, safety rules, comprehensive documentation
+**Status:** ✅ COMPLETE
 
 ---
 
 ## Problem 13: Push to GitHub
 
-**Initial Prompt (Given):**
-"Thanks! Let's work on Problem 13: push to GitHub and submit the URL"
+**Prompt Given:**
+> "Thanks! Let's work on Problem 13: push to github and submit the URL"
 
-**Detailed Requirement (from conversation):**
-"Put your code in a folder named 'hw4' and push it to a PUBLIC github repository. Do not put the real '.env', 'campus_customs.db' or product images in the github repo. Use '.gitignore'. Include '.env.example' with placeholders only."
+**Detailed Prompt:**
+> "Put your code in a folder named 'hw4' and push it to a PUBLIC github repository. Do not put the real '.env', 'campus_customs.db' or product images in the github repo. Use '.gitignore'. Include '.env.example' with placeholders only."
 
 **Implementation:**
 - Created .gitignore to exclude: .env, *.db, products/, node_modules/, etc.
@@ -314,11 +323,12 @@ Document of all prompts given during HW4 development, with follow-ups where nece
 - ✅ Frontend (React/Vite/TypeScript)
 - ✅ Documentation (harness.md, design.md, usability.md, app_check.html)
 - ✅ Audit trail (audit_trail.json)
+- ✅ requirements.txt (Python dependencies)
 - ❌ .env (excluded - use .env.example)
 - ❌ Database (excluded - users provide their own)
 - ❌ Product images (excluded - too large)
 
-**Status:** ✅ COMPLETE - Code pushed to public GitHub at https://github.com/kristinefeng/campus-customs
+**Status:** ✅ COMPLETE
 
 ---
 
@@ -327,7 +337,7 @@ Document of all prompts given during HW4 development, with follow-ups where nece
 - ✅ Problem 1: Vibe Coder prompts (this file)
 - ✅ Problem 2: Database analysis (harness.md)
 - ✅ Problem 3: Website scaffold (React/FastAPI)
-- ✅ Problem 4: Account/Login (full auth system)
+- ✅ Problem 4: Account/Login (full auth system with first_name, last_name, email, password)
 - ✅ Problem 5: PydanticAI agent (Claude gpt-4o-mini via Portkey)
 - ✅ Problem 6: Product tools (search, get, check, browse with real data)
 - ✅ Problem 7: Chat → page updates (products displayed from chat)
