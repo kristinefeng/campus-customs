@@ -5,7 +5,7 @@ A full-stack web application combining React frontend, FastAPI backend, and Pyda
 ## Features
 
 ✨ **AI-Powered Shopping**
-- PydanticAI agent (Claude gpt-4o-mini) understands customer intent
+- PydanticAI agent (OpenAI gpt-4o-mini) understands customer intent
 - Real-time inventory checking from SQLite database
 - Semantic color matching ("blue" → navy, cobalt, sky blue)
 - Context-aware recommendations based on viewed products
@@ -41,21 +41,30 @@ A full-stack web application combining React frontend, FastAPI backend, and Pyda
 ### 1. Backend Setup
 
 ```bash
-# Clone and navigate to project
-cd hw4
+# Clone and navigate to the project
+git clone https://github.com/kristinefeng/campus-customs.git
+cd campus-customs
 
-# Create .env file with your credentials
+# Create .env from the template
 cp .env.example .env
-# Edit .env and add your PORTKEY_API_KEY
+```
 
-# Set database path (update path as needed)
-export DATABASE_PATH=~/Downloads/data\ 2/campus_customs.db
-export PRODUCTS_PATH=~/Downloads/data\ 2/products
+Edit `.env` and set your `PORTKEY_API_KEY`. Also set `DATABASE_PATH` and
+`PRODUCTS_PATH` to wherever you unzipped the course data, since the database
+and product images are not committed to this repository:
 
-# Install Python dependencies
+```bash
+PORTKEY_API_KEY=your_key_here
+DATABASE_PATH=/path/to/campus_customs.db
+PRODUCTS_PATH=/path/to/products
+```
+
+Then install dependencies and start the server:
+
+```bash
 pip install -r requirements.txt
 
-# Start backend (navigate to backend folder and run uvicorn)
+# The backend runs from inside the backend/ folder
 cd backend
 uvicorn main:app --reload --port 8000
 # Runs on http://localhost:8000
@@ -64,8 +73,8 @@ uvicorn main:app --reload --port 8000
 ### 2. Frontend Setup
 
 ```bash
-# In a new terminal, navigate to frontend
-cd hw4/frontend
+# In a new terminal, from the repository root
+cd frontend
 
 # Install dependencies
 npm install
@@ -96,7 +105,7 @@ npm run dev
 │  └─ localhost:5178
 ├─ Backend (FastAPI/PydanticAI)
 │  └─ localhost:8000
-├─ Agent (Claude gpt-4o-mini via Portkey)
+├─ Agent (OpenAI gpt-4o-mini via Portkey)
 │  └─ 4 database tools: search, get_product, check_availability, browse_popular
 └─ Database (SQLite)
    ├─ catalogue (products)
@@ -116,13 +125,13 @@ npm run dev
 
 **Backend:**
 - FastAPI (async Python web framework)
-- PydanticAI (Claude integration)
+- PydanticAI (agent framework)
 - Portkey (OpenAI-compatible gateway)
 - SQLite (local database)
 - Bcrypt (password hashing)
 
 **Agent:**
-- Claude gpt-4o-mini model
+- OpenAI gpt-4o-mini model
 - System prompt with safety rules (prompts/prompt.md)
 - 4 database tools with real inventory access
 - Append-only audit logging
@@ -237,7 +246,7 @@ See [harness.md](output/harness.md) for full safety documentation.
 ## Project Structure
 
 ```
-hw4/
+campus-customs/
 ├── README.md                    # This file
 ├── .env.example                 # Template for environment variables
 ├── .gitignore                   # Git ignore rules
@@ -286,17 +295,16 @@ PORTKEY_API_KEY=your_key_here
 
 ## Running Full Stack
 
-**Terminal 1 - Backend:**
+**Terminal 1 - Backend** (from the repository root):
 ```bash
-cd hw4/backend
-export PORTKEY_API_KEY="your-key-here"
+cd backend
 uvicorn main:app --reload --port 8000
 # Runs on http://localhost:8000
 ```
 
-**Terminal 2 - Frontend:**
+**Terminal 2 - Frontend** (from the repository root):
 ```bash
-cd hw4/frontend
+cd frontend
 npm install
 npm run dev
 # Opens http://localhost:5178
@@ -307,8 +315,8 @@ Then visit http://localhost:5178 in your browser.
 ## Troubleshooting
 
 **Backend won't start:**
-- Check PORTKEY_API_KEY is set: `echo $PORTKEY_API_KEY`
-- Verify database path: `ls ~/Downloads/data\ 2/campus_customs.db`
+- Check `PORTKEY_API_KEY` is set in `.env`
+- Verify `DATABASE_PATH` in `.env` points at an existing `campus_customs.db`
 - Check port 8000 is available: `lsof -i :8000`
 
 **Frontend won't load products:**

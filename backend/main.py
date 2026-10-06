@@ -3,12 +3,17 @@ import os
 import bcrypt
 import secrets
 import hashlib
+from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
 from pydantic import BaseModel
+from dotenv import load_dotenv
 import asyncio
+
+# Must run before importing agent/tools, which read these paths at import time.
+load_dotenv(Path(__file__).parent.parent / ".env")
 
 try:
     from agent import chat_with_agent
@@ -29,8 +34,8 @@ app.add_middleware(
 )
 
 # Path to the database
-DB_PATH = os.path.expanduser("~/Downloads/data 2/campus_customs.db")
-PRODUCTS_PATH = os.path.expanduser("~/Downloads/data 2/products")
+DB_PATH = os.path.expanduser(os.environ.get("DATABASE_PATH", "~/Downloads/data 2/campus_customs.db"))
+PRODUCTS_PATH = os.path.expanduser(os.environ.get("PRODUCTS_PATH", "~/Downloads/data 2/products"))
 
 # Pydantic models for auth
 class RegisterRequest(BaseModel):

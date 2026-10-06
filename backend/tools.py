@@ -7,7 +7,7 @@ try:
 except ImportError:
     from .models import ProductSearchResult, ProductDetails, InventoryItem
 
-DB_PATH = os.path.expanduser("~/Downloads/data 2/campus_customs.db")
+DB_PATH = os.path.expanduser(os.environ.get("DATABASE_PATH", "~/Downloads/data 2/campus_customs.db"))
 
 def get_db():
     """Get database connection."""

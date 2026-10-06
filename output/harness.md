@@ -9,7 +9,7 @@ Campus Customs is a full-stack AI-powered college merchandise e-commerce system 
 
 - **Frontend:** React + Vite + TypeScript (localhost:5178)
 - **Backend:** FastAPI + PydanticAI + SQLite (localhost:8000)
-- **Agent:** Claude gpt-4o-mini via Portkey with 4 database tools
+- **Agent:** OpenAI gpt-4o-mini via Portkey with 4 database tools
 - **Safety:** Append-only audit trail logging + system prompt guardrails
 
 ## Architecture
@@ -19,7 +19,7 @@ React (localhost:5178)
     ↓ HTTP/JSON
 FastAPI (localhost:8000)
     ↓ Agent calls tools
-PydanticAI Agent (Claude)
+PydanticAI Agent (OpenAI gpt-4o-mini)
     ↓ Tool calls
 SQLite Database
     ↓ Audit logging
@@ -207,7 +207,7 @@ InventoryItem:
 - **Framework:** FastAPI (async)
 - **Database:** SQLite at ~/Downloads/data\ 2/campus_customs.db
 - **Auth:** bcrypt password hashing (12 rounds)
-- **Agent:** Claude gpt-4o-mini via Portkey gateway
+- **Agent:** OpenAI gpt-4o-mini via Portkey gateway
 - **Logging:** Audit trail to output/audit_trail.json
 
 ### Database Schema
@@ -226,7 +226,7 @@ chat_messages (id, user_id, role, content, products_json, created_at)
 ```
 
 ### Agent Configuration
-- **Model:** Claude gpt-4o-mini via Portkey
+- **Model:** OpenAI gpt-4o-mini via Portkey
 - **Max tokens:** 1000 per response
 - **Tools:** search_catalog, get_product, check_availability, browse_popular
 - **System Prompt:** prompts/prompt.md (237 lines with safety rules)
@@ -236,19 +236,57 @@ chat_messages (id, user_id, role, content, products_json, created_at)
   [Currently viewing product: Basic Hoodie Big Yale]
   ```
 
+## Customer Memory & Chat History
+
+### How history is stored
+Every exchange for a signed-in shopper is written to `chat_messages` as two rows
+(one `user` role, one `assistant`), keyed by `user_id`. Any product cards returned
+with a reply are serialised into `products_json` so the cards re-render exactly as
+they first appeared. `POST /api/chat` only writes when the request carries a
+`user_id`.
+
+### Guests vs logged-in shoppers
+Guests can chat normally — the input is live and the agent answers with the same
+tools and data. Their conversation simply is not persisted, so it disappears on
+refresh; the input placeholder reads "Ask something... (history not saved)".
+Logged-in shoppers get the same chat plus persistence: `GET /api/chat/history`
+reloads their last 50 messages in chronological order when they sign back in, and
+logging out clears the panel.
+
+### What the agent knows about the customer
+`get_user_info()` reads `first_name`, `last_name`, and `email` from `users` and the
+chat endpoint injects them as a context header. Password hashes are never loaded
+into agent context.
+
+```
+[Customer: Sarah Chen (sarah@yale.edu)]
+```
+
+### How page context is passed
+The front end sends `current_product_id` and `current_product_name` with each
+message, prepended as a second context header. A separate `contextProduct` state
+keeps the referent alive after the shopper navigates back to the grid, so a
+follow-up like "do you have this in pink?" still resolves to the right item.
+
+```
+[Currently viewing product: Basic Hoodie Big Yale]
+```
+
 ## How to Run Full Stack
 
 ### 1. Start Backend
 ```bash
-cd hw4
-export PORTKEY_API_KEY="your-key-here"
-python3 -m backend.main
+# From the repository root, after `pip install -r requirements.txt`
+# and filling in .env (PORTKEY_API_KEY, DATABASE_PATH, PRODUCTS_PATH)
+cd backend
+uvicorn main:app --reload --port 8000
 # Verify: curl http://localhost:8000/ → {"message": "Campus Customs API"}
 ```
 
 ### 2. Start Frontend
 ```bash
-cd hw4/frontend
+# From the repository root
+cd frontend
 npm install
 npm run dev
 # Opens http://localhost:5178
@@ -263,7 +301,7 @@ npm run dev
 
 ### 4. Verify Audit Trail
 ```bash
-cat hw4/output/audit_trail.json | jq '.'
+cat output/audit_trail.json | jq '.'
 # Shows: timestamp, tool, args, result, stop_reason for every tool call
 ```
 
