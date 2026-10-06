@@ -55,8 +55,9 @@ export PRODUCTS_PATH=~/Downloads/data\ 2/products
 # Install Python dependencies
 pip install -r requirements.txt
 
-# Start backend
-python3 -m backend.main
+# Start backend (navigate to backend folder and run uvicorn)
+cd backend
+uvicorn main:app --reload --port 8000
 # Runs on http://localhost:8000
 ```
 
@@ -287,10 +288,9 @@ PORTKEY_API_KEY=your_key_here
 
 **Terminal 1 - Backend:**
 ```bash
-cd hw4
-pip install -r requirements.txt
+cd hw4/backend
 export PORTKEY_API_KEY="your-key-here"
-python3 -m backend.main
+uvicorn main:app --reload --port 8000
 # Runs on http://localhost:8000
 ```
 

@@ -4,8 +4,13 @@ import json
 from pathlib import Path
 from datetime import datetime
 from pydantic_ai import Agent, RunContext
-from .models import ChatResponse
-from .tools import search_products, get_product_details, check_inventory, get_popular_products
+
+try:
+    from models import ChatResponse
+    from tools import search_products, get_product_details, check_inventory, get_popular_products
+except ImportError:
+    from .models import ChatResponse
+    from .tools import search_products, get_product_details, check_inventory, get_popular_products
 
 # Load the system prompt
 PROMPT_PATH = Path(__file__).parent / "prompts" / "prompt.md"

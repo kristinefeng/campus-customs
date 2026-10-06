@@ -1,7 +1,11 @@
 import sqlite3
 import os
 from typing import Optional, List
-from .models import ProductSearchResult, ProductDetails, InventoryItem
+
+try:
+    from models import ProductSearchResult, ProductDetails, InventoryItem
+except ImportError:
+    from .models import ProductSearchResult, ProductDetails, InventoryItem
 
 DB_PATH = os.path.expanduser("~/Downloads/data 2/campus_customs.db")
 

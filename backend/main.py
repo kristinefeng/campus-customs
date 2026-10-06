@@ -9,8 +9,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
 from pydantic import BaseModel
 import asyncio
-from .agent import chat_with_agent
-from .models import ChatRequest, ChatResponse
+
+try:
+    from agent import chat_with_agent
+    from models import ChatRequest, ChatResponse
+except ImportError:
+    from .agent import chat_with_agent
+    from .models import ChatRequest, ChatResponse
 
 app = FastAPI(title="Campus Customs API")
 
