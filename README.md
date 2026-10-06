@@ -52,8 +52,8 @@ cp .env.example .env
 export DATABASE_PATH=~/Downloads/data\ 2/campus_customs.db
 export PRODUCTS_PATH=~/Downloads/data\ 2/products
 
-# Install Python dependencies (if requirements.txt exists)
-pip install fastapi uvicorn pydantic-ai bcrypt python-dotenv
+# Install Python dependencies
+pip install -r requirements.txt
 
 # Start backend
 python3 -m backend.main
@@ -288,6 +288,7 @@ PORTKEY_API_KEY=your_key_here
 **Terminal 1 - Backend:**
 ```bash
 cd hw4
+pip install -r requirements.txt
 export PORTKEY_API_KEY="your-key-here"
 python3 -m backend.main
 # Runs on http://localhost:8000
