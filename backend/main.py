@@ -282,10 +282,12 @@ def get_chat_history(user_id: int, limit: int = 50) -> list:
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute(
+        # created_at only has second precision, so a user message and its reply
+        # usually tie; id breaks the tie and keeps the pair in the right order.
         """SELECT role, content, products_json, created_at
            FROM chat_messages
            WHERE user_id = ?
-           ORDER BY created_at DESC
+           ORDER BY created_at DESC, id DESC
            LIMIT ?""",
         (user_id, limit)
     )
