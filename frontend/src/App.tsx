@@ -15,6 +15,9 @@ interface ChatMessage {
   products?: Product[]
 }
 
+const imageUrl = (p: { image_file_path: string }) =>
+  `http://localhost:8000/api/images/${p.image_file_path.split('/').pop() || p.image_file_path}`
+
 // The agent replies in markdown. Render **bold** as real bold by building
 // React nodes rather than injecting HTML, so model output can never inject markup.
 function renderMarkdownBold(text: string) {
@@ -42,6 +45,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null)
   const [contextProduct, setContextProduct] = useState<any | null>(null)  // Keep context even when viewing grid
+  const [featured, setFeatured] = useState<any[]>([])
 
   // Chat state
   const [chatOpen, setChatOpen] = useState(false)
@@ -56,6 +60,14 @@ function App() {
       loadChatHistory()
     }
   }, [isLoggedIn, userId])
+
+  // Featured items for the landing page
+  useEffect(() => {
+    fetch('http://localhost:8000/api/products?limit=8')
+      .then(res => res.json())
+      .then(data => setFeatured(data.products || []))
+      .catch(err => console.error('Failed to load featured products:', err))
+  }, [])
 
   // Fetch full product data with inventory when product is selected
   useEffect(() => {
@@ -288,10 +300,78 @@ function App() {
       <main className="content">
         {page === 'home' && (
           <div className="home">
-            <h2>Welcome to Campus Customs</h2>
-            <p>Your ultimate destination for authentic college merchandise.</p>
-            {!isLoggedIn && (
-              <button onClick={() => setPage('login')} className="cta-btn">Log In to Shop</button>
+            <section className="hero">
+              <div className="hero-copy">
+                <span className="eyebrow">Officially Licensed · New Haven</span>
+                <h2>Wear the <em>Blue</em>.</h2>
+                <p>
+                  Heavyweight fleece, stitched lettering, and fits made for the walk
+                  across Cross Campus. Authentic Yale apparel — with live stock you can
+                  actually trust.
+                </p>
+                <div className="hero-actions">
+                  <button onClick={handleProductsClick} className="cta-btn">Shop the Collection</button>
+                  <button onClick={() => setChatOpen(true)} className="cta-btn ghost">Ask our stylist</button>
+                </div>
+                <dl className="hero-stats">
+                  <div><dt>100+</dt><dd>Pieces in stock</dd></div>
+                  <div><dt>XS–XXL</dt><dd>Every core fit</dd></div>
+                  <div><dt>Live</dt><dd>Inventory counts</dd></div>
+                </dl>
+              </div>
+              <div className="hero-art" aria-hidden="true">
+                {featured.slice(0, 3).map((p, i) => (
+                  <figure key={p.product_id} className={`hero-tile tile-${i + 1}`}>
+                    <img src={imageUrl(p)} alt="" loading="lazy" />
+                  </figure>
+                ))}
+              </div>
+            </section>
+
+            <section className="value-props">
+              <div className="value-prop">
+                <span className="vp-mark">01</span>
+                <h3>Licensed, not lookalike</h3>
+                <p>Champion, Brooks Brothers, and the Yale marks you actually recognize.</p>
+              </div>
+              <div className="value-prop">
+                <span className="vp-mark">02</span>
+                <h3>Stock we don't fake</h3>
+                <p>Every size count comes live from the warehouse — down to the last XL.</p>
+              </div>
+              <div className="value-prop">
+                <span className="vp-mark">03</span>
+                <h3>Built to survive finals</h3>
+                <p>Fleece that keeps its shape through four years of laundry cycles.</p>
+              </div>
+            </section>
+
+            {featured.length > 0 && (
+              <section className="featured">
+                <div className="section-head">
+                  <h3>Campus favorites</h3>
+                  <button onClick={handleProductsClick} className="link-btn">View all →</button>
+                </div>
+                <div className="featured-grid">
+                  {featured.slice(0, 4).map((product) => (
+                    <div
+                      key={product.product_id}
+                      className="product-card"
+                      onClick={() => {
+                        setSelectedProduct(product)
+                        setContextProduct(product)
+                        setPage('products')
+                      }}
+                    >
+                      <div className="card-media">
+                        <img src={imageUrl(product)} alt={product.name} loading="lazy" />
+                      </div>
+                      <h3>{product.name}</h3>
+                      <p className="card-price">${product.price.toFixed(2)}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
             )}
           </div>
         )}
@@ -424,27 +504,25 @@ function App() {
             {loading && <p>Loading...</p>}
             {error && <div className="error">{error}</div>}
             <div className="products-grid">
-              {displayProducts.map((product) => {
-                const filename = product.image_file_path.split('/').pop() || product.image_file_path
-                return (
-                  <div
-                    key={product.product_id}
-                    className="product-card"
-                    onClick={() => {
-                      setSelectedProduct(product)
-                      setContextProduct(product)
-                    }}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <img src={`http://localhost:8000/api/images/${filename}`} alt={product.name} />
-                    <h3>{product.name}</h3>
-                    <p>${product.price.toFixed(2)}</p>
-                    {product.description && (
-                      <p className="product-description">{product.description.substring(0, 80)}...</p>
-                    )}
+              {displayProducts.map((product) => (
+                <div
+                  key={product.product_id}
+                  className="product-card"
+                  onClick={() => {
+                    setSelectedProduct(product)
+                    setContextProduct(product)
+                  }}
+                >
+                  <div className="card-media">
+                    <img src={imageUrl(product)} alt={product.name} loading="lazy" />
                   </div>
-                )
-              })}
+                  <h3>{product.name}</h3>
+                  <p className="card-price">${product.price.toFixed(2)}</p>
+                  {product.description && (
+                    <p className="product-description">{product.description.substring(0, 80)}…</p>
+                  )}
+                </div>
+              ))}
             </div>
             {displayProducts.length === 0 && !loading && (
               <p className="no-results">No products found. Try searching in chat!</p>
