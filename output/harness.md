@@ -7,7 +7,7 @@
 
 Campus Customs is a full-stack AI-powered college merchandise e-commerce system combining React frontend, FastAPI backend, PydanticAI agent, and SQLite database with comprehensive safety auditing.
 
-- **Frontend:** React + Vite + TypeScript (localhost:5178)
+- **Frontend:** React + Vite + TypeScript (localhost:5173)
 - **Backend:** FastAPI + PydanticAI + SQLite (localhost:8000)
 - **Agent:** OpenAI gpt-4o-mini via Portkey with 4 database tools
 - **Safety:** Append-only audit trail logging + system prompt guardrails
@@ -15,7 +15,7 @@ Campus Customs is a full-stack AI-powered college merchandise e-commerce system 
 ## Architecture
 
 ```
-React (localhost:5178) 
+React (localhost:5173) 
     ↓ HTTP/JSON
 FastAPI (localhost:8000)
     ↓ Agent calls tools
@@ -193,7 +193,7 @@ InventoryItem:
 ## System Specifications
 
 ### Frontend (React/Vite/TypeScript)
-- **Port:** localhost:5178 (or next available)
+- **Port:** localhost:5173 (or next available)
 - **Build:** npm install && npm run dev
 - **Pages:**
   - Home: Brand intro + CTA
@@ -292,7 +292,7 @@ uvicorn main:app --reload --port 8000
 cd frontend
 npm install
 npm run dev
-# Opens http://localhost:5178
+# Opens http://localhost:5173
 ```
 
 ### 3. Test the App

@@ -81,7 +81,7 @@ npm install
 
 # Start dev server
 npm run dev
-# Opens on http://localhost:5178 (or next available port)
+# Opens on http://localhost:5173 (or next available port)
 ```
 
 ### 3. Test the Application
@@ -102,7 +102,7 @@ npm run dev
 
 ```
 ┌─ Frontend (React/Vite/TypeScript)
-│  └─ localhost:5178
+│  └─ localhost:5173
 ├─ Backend (FastAPI/PydanticAI)
 │  └─ localhost:8000
 ├─ Agent (OpenAI gpt-4o-mini via Portkey)
@@ -307,10 +307,10 @@ uvicorn main:app --reload --port 8000
 cd frontend
 npm install
 npm run dev
-# Opens http://localhost:5178
+# Opens http://localhost:5173
 ```
 
-Then visit http://localhost:5178 in your browser.
+Then visit http://localhost:5173 in your browser.
 
 ## Troubleshooting
 
