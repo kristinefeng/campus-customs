@@ -48,21 +48,39 @@
 
 ---
 
-### 2. Semantic Color Matching Tool ✅
+### 2. Semantic Color Matching in Catalogue Search ✅
 
-**What:** Enhanced agent to understand color variations and suggest alternatives:
-- "Blue" → searches for navy, cobalt, sky blue, denim
-- "Red" → searches for crimson, maroon, burgundy
-- "Green" → searches for forest, sage, olive
-- When exact color unavailable → proactively suggests alternatives
+**What:** Rewrote `search_products()` in `backend/tools.py` so the SQL itself
+understands colour language, instead of the old single `LIKE '%<raw query>%'`:
+
+- A `COLOR_SYNONYMS` map expands a shopper's word to the shades the catalogue
+  actually uses — `blue → navy, royal, cobalt, sky, denim`;
+  `grey → gray, charcoal, heather, slate`; and nine more families.
+- The query is tokenised and AND-ed, so "blue hoodies" means
+  *(blue OR navy OR royal …) AND (hoodies OR hoodie)* rather than one literal
+  phrase match. Plurals are folded to singular.
+- **Colour words are matched against the `colors` column only.** This matters:
+  the Harvard–Yale tee is heather grey but its description mentions "navy Yale
+  helmets", so searching prose for a colour returns garments that aren't that
+  colour at all.
+- Stopwords ("do you have any…") are dropped, so a conversational question
+  searches on its real content.
+- If an AND across every token returns nothing, it retries as an OR rather than
+  showing the shopper an empty grid.
 
 **Why it helps:**
-- **Fewer failed searches** — "Do you have blue hoodies?" now finds navy hoodies instead of "nothing found"
-- **Better recommendations** — Agent understands customer intent with natural language
-- **Natural conversation** — Customers don't need to know exact color names
-- **Campus Customs benefit** — Converts "sorry, we don't have that" into successful sales
+- **Fewer dead ends** — "Do you have blue hoodies?" returns the navy hoodies.
+  Previously the literal string `%blue hoodies%` matched no row in the table.
+- **Conversational queries work** — "do you have any red crewnecks" searches on
+  *red* and *crewneck*, not on the whole sentence.
+- **Precision, not just recall** — scoping colour to the `colors` column keeps
+  grey shirts out of a search for blue.
+- **Campus Customs benefit** — a shopper who uses a different word for a colour
+  than the buyer did still finds the garment, instead of bouncing.
 
-**Status:** ✅ TESTED AND WORKING - Agent correctly handles color variations and suggests alternatives for unavailable colors
+**Status:** ✅ Verified against the live database: `blue hoodies` → 5 navy
+hoodies; `grey` → heather-grey items; a nonsense term → 0 results (no false
+matches).
 
 ---
 

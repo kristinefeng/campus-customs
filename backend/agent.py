@@ -2,6 +2,7 @@ import os
 import sys
 import json
 from pathlib import Path
+from typing import Optional
 from datetime import datetime
 from pydantic_ai import Agent, RunContext
 from pydantic_ai.usage import UsageLimits
@@ -72,7 +73,12 @@ def create_agent():
                 stock_info = f"(Available: {', '.join(available)})" if available else "(Out of stock)"
             else:
                 stock_info = f"({inv_data.get('quantity', 0)} in stock)"
-            formatted += f"- **{p.name}** — **${p.price}** {stock_info} - {p.description}\n"
+            # product_id must be surfaced: the system prompt requires the model to
+            # emit [PRODUCT: product-id], and without it the model guesses the slug.
+            formatted += (
+                f"- **{p.name}** — **${p.price}** {stock_info} - {p.description} "
+                f"[product_id: {p.product_id}]\n"
+            )
         return formatted
 
     @agent.tool
@@ -104,7 +110,7 @@ Stock by Size:
 """
 
     @agent.tool
-    async def check_availability(ctx: RunContext[None], product_id: str, size: str = None) -> str:
+    async def check_availability(ctx: RunContext[None], product_id: str, size: Optional[str] = None) -> str:
         """Check if a product is in stock and what sizes are available."""
         result = check_inventory(product_id, size)
         log_audit_trail("check_availability", {"product_id": product_id, "size": size},
@@ -134,7 +140,10 @@ Stock by Size:
 
         formatted = "Here are some featured products:\n"
         for p in products:
-            formatted += f"- **{p.name}** (${p.price}) - {p.garment_type}\n"
+            formatted += (
+                f"- **{p.name}** (${p.price}) - {p.garment_type} "
+                f"[product_id: {p.product_id}]\n"
+            )
         return formatted
 
     return agent

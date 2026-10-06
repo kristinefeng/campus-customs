@@ -18,9 +18,11 @@ load_dotenv(Path(__file__).parent.parent / ".env")
 try:
     from agent import chat_with_agent
     from models import ChatRequest, ChatResponse
+    from tools import size_sort_key
 except ImportError:
     from .agent import chat_with_agent
     from .models import ChatRequest, ChatResponse
+    from .tools import size_sort_key
 
 app = FastAPI(title="Campus Customs API")
 
@@ -92,7 +94,7 @@ def root():
     return {"message": "Campus Customs API", "status": "online"}
 
 @app.get("/api/products")
-def get_products(skip: int = 0, limit: int = 100):
+def get_products(skip: int = 0, limit: int = 500):
     """Get all products with pagination."""
     conn = get_db()
     cursor = conn.cursor()
@@ -137,7 +139,8 @@ def get_product(product_id: str):
         "SELECT size, quantity FROM inventory WHERE product_id = ? ORDER BY size",
         (product_id,)
     )
-    inventory = [{"size": row["size"], "quantity": row["quantity"]} for row in cursor.fetchall()]
+    inventory = [{"size": row["size"], "quantity": row["quantity"]}
+                 for row in sorted(cursor.fetchall(), key=lambda r: size_sort_key(r["size"]))]
     product_dict["inventory"] = inventory
 
     conn.close()

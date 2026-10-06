@@ -38,6 +38,7 @@ function App() {
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
   const [products, setProducts] = useState<any[]>([])
   const [searchInput, setSearchInput] = useState('')
@@ -69,14 +70,26 @@ function App() {
       .catch(err => console.error('Failed to load featured products:', err))
   }, [])
 
-  // Fetch full product data with inventory when product is selected
+  // Fetch full product data with inventory when product is selected.
+  // `cancelled` guards against a slow response for a product the shopper has
+  // already navigated away from yanking them back into the detail view.
   useEffect(() => {
-    if (selectedProduct && selectedProduct.product_id) {
-      fetch(`http://localhost:8000/api/products/${selectedProduct.product_id}`)
-        .then(res => res.json())
-        .then(data => setSelectedProduct(data))
-        .catch(err => console.error('Failed to load product details:', err))
-    }
+    const id = selectedProduct?.product_id
+    if (!id) return
+    let cancelled = false
+    fetch(`http://localhost:8000/api/products/${id}`)
+      .then(res => {
+        if (!res.ok) throw new Error(`Product ${id} not found`)
+        return res.json()
+      })
+      .then(data => { if (!cancelled) setSelectedProduct(data) })
+      .catch(err => {
+        if (cancelled) return
+        console.error('Failed to load product details:', err)
+        setError('Sorry, we could not load that product.')
+        setSelectedProduct(null)
+      })
+    return () => { cancelled = true }
   }, [selectedProduct?.product_id])
 
   const loadChatHistory = async () => {
@@ -135,6 +148,12 @@ function App() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.')
+      return
+    }
+
     setLoading(true)
 
     try {
@@ -160,6 +179,7 @@ function App() {
       setPage('products')
       setEmail('')
       setPassword('')
+      setConfirmPassword('')
       setFirstName('')
       setLastName('')
       // Chat history will load via useEffect
@@ -195,23 +215,25 @@ function App() {
     }
   }
 
+  // Always refetch: after a chat search `products` holds only those few matches,
+  // so a length check would leave the shopper stranded on a partial catalogue.
   const handleProductsClick = () => {
     setPage('products')
-    if (products.length === 0) {
-      fetchProducts()
-    }
+    setError('')
+    setSearchInput('')
     setSearchQuery('')
     setSelectedProduct(null)
+    fetchProducts()
   }
 
   const handleChatSend = async () => {
-    if (!chatInput.trim()) return
+    if (!chatInput.trim() || chatLoading) return
 
     // Save the message before clearing the input
     const message = chatInput
 
     const userMsg: ChatMessage = { role: 'user', content: message }
-    setChatMessages([...chatMessages, userMsg])
+    setChatMessages(prev => [...prev, userMsg])
     setChatInput('')
     setChatLoading(true)
 
@@ -242,6 +264,7 @@ function App() {
       // If chat returned products, display them on the products page
       if (data.products && data.products.length > 0) {
         setProducts(data.products)
+        setSearchInput('')
         setSearchQuery(message)
         setPage('products')
         setSelectedProduct(null)
@@ -358,6 +381,7 @@ function App() {
                       key={product.product_id}
                       className="product-card"
                       onClick={() => {
+                        if (products.length === 0) fetchProducts()
                         setSelectedProduct(product)
                         setContextProduct(product)
                         setPage('products')
@@ -455,6 +479,13 @@ function App() {
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <input
+                  type="password"
+                  placeholder="Confirm Password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                 />
                 <button type="submit" disabled={loading}>{loading ? 'Creating account...' : 'Create Account'}</button>

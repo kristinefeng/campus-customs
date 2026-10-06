@@ -214,20 +214,51 @@ InventoryItem:
 - **Agent:** OpenAI gpt-4o-mini via Portkey gateway
 - **Logging:** Audit trail to output/audit_trail.json
 
-### Database Schema
-```sql
--- Users table
-users (id, first_name, last_name, email, password_hash, name)
+### Database Schema — every field, and why it matters
 
--- Products catalog
-catalogue (product_id, name, price, garment_type, description, colors, search_tags, image_file_path)
+**`catalogue`** — one row per product (102 rows).
 
--- Real-time inventory
-inventory (product_id, size, quantity)
+| Field | Type | Why it matters |
+|---|---|---|
+| `product_id` | TEXT | Slug primary key. The agent emits it as `[PRODUCT: id]` so the front end can resolve a reply into real product cards. |
+| `name` | TEXT | What the shopper sees on the card and the detail page. |
+| `garment_type` | TEXT | Lets "do you have crewnecks?" match on category rather than guessing from the name. |
+| `description` | TEXT | Detail-page copy, and search matches against it so a shopper can find things by phrasing. |
+| `colors` | TEXT | JSON array of shades. The only trustworthy colour source — descriptions mention colours that aren't the garment's own, so colour search reads this column alone. |
+| `search_tags` | TEXT | Extra keywords ("game day", "crew") that aren't in the name, widening what a shopper can find. |
+| `image_file_path` | TEXT | Resolves to `/api/images/{filename}`; without it a card has no picture and the shopper has nothing to judge. |
+| `price` | REAL | The single source of truth for price. The agent is forbidden to state a price it did not read from here. |
 
--- Chat history
-chat_messages (id, user_id, role, content, products_json, created_at)
-```
+**`inventory`** — one row per product/size pair.
+
+| Field | Type | Why it matters |
+|---|---|---|
+| `id` | INTEGER | Surrogate primary key. |
+| `product_id` | TEXT | Foreign key to `catalogue`; joins stock onto a product. |
+| `size` | TEXT | XS–XXL. Drives the size selector and answers "do you have a medium?". |
+| `quantity` | INTEGER | The honest number. `0` renders a disabled, out-of-stock size button rather than letting a shopper order something that isn't there. |
+
+**`users`** — one row per account.
+
+| Field | Type | Why it matters |
+|---|---|---|
+| `id` | INTEGER | Primary key; keys chat history to the shopper. |
+| `first_name` / `last_name` | TEXT | Collected at registration and injected into agent context so it can greet by name. |
+| `name` | TEXT | Legacy combined name kept populated for backwards compatibility with the seeded rows. |
+| `email` | TEXT | Login identifier and the account's unique handle. |
+| `password_hash` | TEXT | Bcrypt (12 rounds). The plaintext password is never stored, so a database leak does not expose accounts. |
+| `created_at` | TEXT | Account age, for support questions. |
+
+**`chat_messages`** — one row per message, logged-in shoppers only.
+
+| Field | Type | Why it matters |
+|---|---|---|
+| `id` | INTEGER | Primary key, and the tie-break that keeps a question above its answer when `created_at` collides. |
+| `user_id` | INTEGER | Owns the message. Guests send `NULL`, which is exactly why guest chat is never persisted. |
+| `role` | TEXT | `user` or `assistant`; decides which side of the panel a bubble renders on. |
+| `content` | TEXT | The message text itself. |
+| `products_json` | TEXT | Serialised product cards, so a reloaded conversation shows the same cards it originally did instead of bare text. |
+| `created_at` | TEXT | Chronological ordering on reload. Second precision only — hence the `id` tie-break above. |
 
 ### Agent Configuration
 - **Model:** OpenAI gpt-4o-mini via Portkey
@@ -238,6 +269,34 @@ chat_messages (id, user_id, role, content, products_json, created_at)
   [Customer: Sarah Chen (sarah@yale.edu)]
   [Currently viewing product: Basic Hoodie Big Yale]
   ```
+
+## How Search Results Reach the Page (Problem 7)
+
+A category question in the chat has to end up as product cards on the Products
+page. That path is an API contract, not a UI trick:
+
+1. **Shopper asks** — "what hoodies do you have?" goes to `POST /api/chat`.
+2. **Agent searches** — the model calls `search_catalog`, which runs
+   `search_products()` against `catalogue`. Each formatted result now carries its
+   `product_id`, because the next step depends on the model knowing it.
+3. **Agent marks its picks** — the system prompt (`backend/prompts/prompt.md`)
+   requires `[PRODUCT: product-id]` at the end of every product line.
+4. **Backend resolves the markers** — `chat_with_agent()` regexes out every
+   `[PRODUCT: ...]`, calls `get_product_details()` for each id, and builds a list
+   of `{product_id, name, price, image_file_path, description}`. The markers are
+   then stripped from the visible text, so the shopper never sees them.
+5. **Response carries both** — `ChatResponse` returns prose in `content` and
+   structured matches in `products`.
+6. **Front end renders** — `handleChatSend()` in `App.tsx` sees a non-empty
+   `products` array, writes it into the grid, sets the heading to
+   `Search Results for "…"`, switches to the Products page, and clears the search
+   box so a stale filter term cannot hide the new results.
+7. **Detail view still works** — each card keeps the Problem 3 click behaviour, so
+   clicking one opens the full detail page with image, description, and the live
+   size selector.
+
+If the model emits an id that doesn't exist, `get_product_details()` returns
+`None` and that entry is skipped rather than rendering a broken card.
 
 ## Customer Memory & Chat History
 

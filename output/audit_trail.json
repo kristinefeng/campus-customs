@@ -327,5 +327,68 @@
     "args_summary": "{'product_id': 'baseball-left-chest-crewneck'}",
     "result_summary": "Retrieved: Baseball Left Chest Crewneck",
     "stop_reason": "success"
+  },
+  {
+    "timestamp": "2026-10-06T03:38:07.737830",
+    "tool": "system",
+    "args_summary": "{'action': 'agent_loaded'}",
+    "result_summary": "PydanticAI initialized",
+    "stop_reason": "success"
+  },
+  {
+    "timestamp": "2026-10-06T03:38:18.336855",
+    "tool": "system",
+    "args_summary": "{'action': 'agent_loaded'}",
+    "result_summary": "PydanticAI initialized",
+    "stop_reason": "success"
+  },
+  {
+    "timestamp": "2026-10-06T03:39:15.275758",
+    "tool": "system",
+    "args_summary": "{'action': 'agent_loaded'}",
+    "result_summary": "PydanticAI initialized",
+    "stop_reason": "success"
+  },
+  {
+    "timestamp": "2026-10-06T03:39:47.911765",
+    "tool": "system",
+    "args_summary": "{'action': 'agent_loaded'}",
+    "result_summary": "PydanticAI initialized",
+    "stop_reason": "success"
+  },
+  {
+    "timestamp": "2026-10-06T03:39:51.245822",
+    "tool": "system",
+    "args_summary": "{'action': 'agent_loaded'}",
+    "result_summary": "PydanticAI initialized",
+    "stop_reason": "success"
+  },
+  {
+    "timestamp": "2026-10-06T03:40:00.172351",
+    "tool": "system",
+    "args_summary": "{'action': 'agent_loaded'}",
+    "result_summary": "PydanticAI initialized",
+    "stop_reason": "success"
+  },
+  {
+    "timestamp": "2026-10-06T03:40:16.098594",
+    "tool": "system",
+    "args_summary": "{'action': 'agent_loaded'}",
+    "result_summary": "PydanticAI initialized",
+    "stop_reason": "success"
+  },
+  {
+    "timestamp": "2026-10-06T03:40:26.319823",
+    "tool": "system",
+    "args_summary": "{'action': 'agent_loaded'}",
+    "result_summary": "PydanticAI initialized",
+    "stop_reason": "success"
+  },
+  {
+    "timestamp": "2026-10-06T03:42:21.760508",
+    "tool": "search_catalog",
+    "args_summary": "{'query': 't-shirts'}",
+    "result_summary": "Found 5 results",
+    "stop_reason": "success"
   }
 ]
