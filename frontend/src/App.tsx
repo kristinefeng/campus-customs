@@ -406,11 +406,10 @@ function App() {
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleChatSend()}
-                placeholder={isLoggedIn ? "Ask something..." : "Log in to chat and save history"}
+                placeholder={isLoggedIn ? "Ask something..." : "Ask something... (history not saved)"}
                 className="chat-input"
-                disabled={!isLoggedIn}
               />
-              <button onClick={handleChatSend} disabled={chatLoading || !isLoggedIn} className="chat-send">
+              <button onClick={handleChatSend} disabled={chatLoading} className="chat-send">
                 {chatLoading ? '...' : 'Send'}
               </button>
             </div>
