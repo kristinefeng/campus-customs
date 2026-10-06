@@ -15,8 +15,18 @@ interface ChatMessage {
   products?: Product[]
 }
 
+// The agent replies in markdown. Render **bold** as real bold by building
+// React nodes rather than injecting HTML, so model output can never inject markup.
+function renderMarkdownBold(text: string) {
+  return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+    part.startsWith('**') && part.endsWith('**') && part.length > 4
+      ? <strong key={i}>{part.slice(2, -2)}</strong>
+      : part
+  )
+}
+
 function App() {
-  const [page, setPage] = useState<'home' | 'login' | 'products'>('home')
+  const [page, setPage] = useState<'home' | 'login' | 'products' | 'about'>('home')
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'))
   const [userEmail, setUserEmail] = useState(localStorage.getItem('user_email') || '')
   const [userId, setUserId] = useState(localStorage.getItem('user_id') || '')
@@ -250,13 +260,27 @@ function App() {
         <div className="nav-links">
           <button onClick={() => setPage('home')} className={page === 'home' ? 'active' : ''}>Home</button>
           <button onClick={handleProductsClick} className={page === 'products' ? 'active' : ''}>Products</button>
+          <button onClick={() => setPage('about')} className={page === 'about' ? 'active' : ''}>About Us</button>
           {isLoggedIn ? (
             <>
               <span className="user-email">{userEmail}</span>
               <button onClick={handleLogout} className="logout-btn">Logout</button>
             </>
           ) : (
-            <button onClick={() => setPage('login')} className={page === 'login' ? 'active' : ''}>Login</button>
+            <>
+              <button
+                onClick={() => { setPage('login'); setIsRegistering(false); setError('') }}
+                className={page === 'login' && !isRegistering ? 'active' : ''}
+              >
+                Log In
+              </button>
+              <button
+                onClick={() => { setPage('login'); setIsRegistering(true); setError('') }}
+                className={page === 'login' && isRegistering ? 'active' : ''}
+              >
+                Create Account
+              </button>
+            </>
           )}
         </div>
       </nav>
@@ -269,6 +293,53 @@ function App() {
             {!isLoggedIn && (
               <button onClick={() => setPage('login')} className="cta-btn">Log In to Shop</button>
             )}
+          </div>
+        )}
+
+        {page === 'about' && (
+          <div className="about-page">
+            <h2>About Campus Customs</h2>
+            <p className="about-lead">
+              We outfit the Yale community in gear worth keeping — pieces you reach for
+              on a cold walk across Cross Campus, not just on game day.
+            </p>
+            <div className="about-sections">
+              <section>
+                <h3>Built for campus life</h3>
+                <p>
+                  Every hoodie, crewneck, and tee in our catalogue is chosen for how it
+                  holds up: heavyweight fleece that survives four years of laundry,
+                  stitched lettering that doesn't peel, and fits that work in a lecture
+                  hall or on the walk home from the library.
+                </p>
+              </section>
+              <section>
+                <h3>Officially licensed</h3>
+                <p>
+                  We carry authentic Yale merchandise from names like Champion and
+                  Brooks Brothers. If it's on our shelves, it's licensed — no knockoffs,
+                  no mystery sourcing.
+                </p>
+              </section>
+              <section>
+                <h3>Honest about stock</h3>
+                <p>
+                  Our shopping assistant reads live inventory straight from our
+                  warehouse. If your size is down to two, it will tell you it's down to
+                  two. If it's gone, it will say so rather than let you find out at
+                  checkout.
+                </p>
+              </section>
+              <section>
+                <h3>Here to help</h3>
+                <p>
+                  Ask the chat anything — what's in navy, whether a crewneck runs large,
+                  what's left in XL. For orders and returns, reach a person at
+                  support@campuscustoms.yale.edu.
+                </p>
+              </section>
+            </div>
+            <button onClick={handleProductsClick} className="cta-btn">Browse the Collection</button>
           </div>
         )}
 
@@ -449,7 +520,7 @@ function App() {
               {chatMessages.map((msg, idx) => (
                 <div key={idx} className={`chat-message-wrapper ${msg.role}`}>
                   <div className={`chat-message ${msg.role}`}>
-                    <p>{msg.content}</p>
+                    <p>{msg.role === 'assistant' ? renderMarkdownBold(msg.content) : msg.content}</p>
                   </div>
                   {msg.products && msg.products.length > 0 && (
                     <div className="chat-products">
