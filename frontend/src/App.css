@@ -227,6 +227,29 @@ body {
   font-weight: 500;
 }
 
+.toggle-auth {
+  text-align: center;
+  margin-top: 1.5rem;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.toggle-auth button {
+  background: none;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: underline;
+  padding: 0;
+  font-size: inherit;
+  transition: color 0.3s ease;
+}
+
+.toggle-auth button:hover {
+  color: var(--secondary);
+}
+
 .products-page {
   padding: 0;
   background: transparent;

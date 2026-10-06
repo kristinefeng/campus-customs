@@ -20,6 +20,9 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'))
   const [userEmail, setUserEmail] = useState(localStorage.getItem('user_email') || '')
   const [userId, setUserId] = useState(localStorage.getItem('user_id') || '')
+  const [isRegistering, setIsRegistering] = useState(false)
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -102,6 +105,44 @@ function App() {
       // Chat history will load via useEffect
     } catch (err: any) {
       setError(err.message || 'Login error')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+
+    try {
+      const res = await fetch('http://localhost:8000/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ first_name: firstName, last_name: lastName, email, password })
+      })
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.detail || 'Registration failed')
+        return
+      }
+
+      // Account created successfully, log them in
+      localStorage.setItem('token', data.token)
+      localStorage.setItem('user_id', data.user_id)
+      localStorage.setItem('user_email', email)
+      setUserId(data.user_id)
+      setIsLoggedIn(true)
+      setUserEmail(email)
+      setPage('products')
+      setEmail('')
+      setPassword('')
+      setFirstName('')
+      setLastName('')
+      // Chat history will load via useEffect
+    } catch (err: any) {
+      setError(err.message || 'Registration error')
     } finally {
       setLoading(false)
     }
@@ -233,25 +274,67 @@ function App() {
 
         {page === 'login' && (
           <div className="login-page">
-            <form onSubmit={handleLogin} className="login-form">
-              <h2>Log In</h2>
-              {error && <div className="error">{error}</div>}
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-              <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <button type="submit" disabled={loading}>{loading ? 'Logging in...' : 'Log In'}</button>
-            </form>
+            {isRegistering ? (
+              <form onSubmit={handleRegister} className="login-form">
+                <h2>Create Account</h2>
+                {error && <div className="error">{error}</div>}
+                <input
+                  type="text"
+                  placeholder="First Name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Last Name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                />
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <button type="submit" disabled={loading}>{loading ? 'Creating account...' : 'Create Account'}</button>
+                <p className="toggle-auth">
+                  Already have an account? <button type="button" onClick={() => { setIsRegistering(false); setError(''); }}>Log In</button>
+                </p>
+              </form>
+            ) : (
+              <form onSubmit={handleLogin} className="login-form">
+                <h2>Log In</h2>
+                {error && <div className="error">{error}</div>}
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <button type="submit" disabled={loading}>{loading ? 'Logging in...' : 'Log In'}</button>
+                <p className="toggle-auth">
+                  Don't have an account? <button type="button" onClick={() => { setIsRegistering(true); setError(''); }}>Create one</button>
+                </p>
+              </form>
+            )}
           </div>
         )}
 
