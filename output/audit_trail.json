@@ -89,5 +89,131 @@
     "args_summary": "{'action': 'agent_loaded'}",
     "result_summary": "PydanticAI initialized",
     "stop_reason": "success"
+  },
+  {
+    "timestamp": "2026-10-06T03:00:28.108053",
+    "tool": "system",
+    "args_summary": "{'action': 'agent_loaded'}",
+    "result_summary": "PydanticAI initialized",
+    "stop_reason": "success"
+  },
+  {
+    "timestamp": "2026-10-06T03:00:37.099187",
+    "tool": "system",
+    "args_summary": "{'action': 'agent_loaded'}",
+    "result_summary": "PydanticAI initialized",
+    "stop_reason": "success"
+  },
+  {
+    "timestamp": "2026-10-06T03:00:39.455292",
+    "tool": "system",
+    "args_summary": "{'action': 'agent_loaded'}",
+    "result_summary": "PydanticAI initialized",
+    "stop_reason": "success"
+  },
+  {
+    "timestamp": "2026-10-06T03:01:36.995189",
+    "tool": "system",
+    "args_summary": "{'action': 'agent_loaded'}",
+    "result_summary": "PydanticAI initialized",
+    "stop_reason": "success"
+  },
+  {
+    "timestamp": "2026-10-06T03:01:54.906787",
+    "tool": "search_catalog",
+    "args_summary": "{'query': 'hoodies'}",
+    "result_summary": "Found 0 results",
+    "stop_reason": "success"
+  },
+  {
+    "timestamp": "2026-10-06T03:01:56.571683",
+    "tool": "search_catalog",
+    "args_summary": "{'query': 'hoodie'}",
+    "result_summary": "Found 5 results",
+    "stop_reason": "success"
+  },
+  {
+    "timestamp": "2026-10-06T03:02:22.922163",
+    "tool": "system",
+    "args_summary": "{'action': 'agent_loaded'}",
+    "result_summary": "PydanticAI initialized",
+    "stop_reason": "success"
+  },
+  {
+    "timestamp": "2026-10-06T03:02:35.051818",
+    "tool": "system",
+    "args_summary": "{'action': 'agent_loaded'}",
+    "result_summary": "PydanticAI initialized",
+    "stop_reason": "success"
+  },
+  {
+    "timestamp": "2026-10-06T03:02:48.700529",
+    "tool": "search_catalog",
+    "args_summary": "{'query': 'hoodies'}",
+    "result_summary": "Found 0 results",
+    "stop_reason": "success"
+  },
+  {
+    "timestamp": "2026-10-06T03:02:48.967642",
+    "tool": "search_catalog",
+    "args_summary": "{'query': 'hoodie'}",
+    "result_summary": "Found 5 results",
+    "stop_reason": "success"
+  },
+  {
+    "timestamp": "2026-10-06T03:02:49.079247",
+    "tool": "check_availability",
+    "args_summary": "{'product_id': 'basic-hoodie-big-yale', 'size': None}",
+    "result_summary": "Stock: N/A",
+    "stop_reason": "success"
+  },
+  {
+    "timestamp": "2026-10-06T03:02:49.081657",
+    "tool": "check_availability",
+    "args_summary": "{'product_id': 'brooks-brothers-double-knit-full-zip-hoodie-yale', 'size': None}",
+    "result_summary": "Stock: N/A",
+    "stop_reason": "success"
+  },
+  {
+    "timestamp": "2026-10-06T03:02:49.083145",
+    "tool": "check_availability",
+    "args_summary": "{'product_id': 'champion-full-zip-hood', 'size': None}",
+    "result_summary": "Stock: N/A",
+    "stop_reason": "success"
+  },
+  {
+    "timestamp": "2026-10-06T03:02:49.084444",
+    "tool": "check_availability",
+    "args_summary": "{'product_id': 'champion-reverse-weave-hoodie-1', 'size': None}",
+    "result_summary": "Stock: N/A",
+    "stop_reason": "success"
+  },
+  {
+    "timestamp": "2026-10-06T03:02:49.085543",
+    "tool": "check_availability",
+    "args_summary": "{'product_id': 'crew-left-chest-hoodie', 'size': None}",
+    "result_summary": "Stock: N/A",
+    "stop_reason": "success"
+  },
+  {
+    "timestamp": "2026-10-06T03:02:53.580576",
+    "tool": "get_product",
+    "args_summary": "{'product_id': 'basic-hoodie-big-yale'}",
+    "result_summary": "Retrieved: Basic Hoodie Big Yale",
+    "stop_reason": "success"
+  },
+  {
+    "timestamp": "2026-10-06T03:04:59.039892",
+    "tool": "system",
+    "args_summary": "{'action': 'agent_loaded'}",
+    "result_summary": "PydanticAI initialized",
+    "stop_reason": "success"
+  },
+  {
+    "timestamp": "2026-10-06T03:05:13.886771",
+    "tool": "browse_popular",
+    "args_summary": "{}",
+    "result_summary": "Found 10 results",
+    "stop_reason": "success"
   }
 ]

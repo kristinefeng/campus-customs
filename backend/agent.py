@@ -4,6 +4,12 @@ import json
 from pathlib import Path
 from datetime import datetime
 from pydantic_ai import Agent, RunContext
+from pydantic_ai.usage import UsageLimits
+
+# Caps documented in output/harness.md. Sized above real usage -- a single
+# category question legitimately costs ~7 calls (one search plus an
+# availability check per result) -- so this only trips on a runaway loop.
+AGENT_USAGE_LIMITS = UsageLimits(tool_calls_limit=20, output_tokens_limit=2000)
 
 try:
     from models import ChatResponse
@@ -122,6 +128,7 @@ Stock by Size:
     async def browse_popular(ctx: RunContext[None]) -> str:
         """Get a list of popular or featured products from the catalog."""
         products = get_popular_products(limit=10)
+        log_audit_trail("browse_popular", {}, f"Found {len(products)} results", "success")
         if not products:
             return "No products available in catalog."
 
@@ -219,7 +226,7 @@ async def chat_with_agent(
             full_message = message
         
         # Run the agent
-        result = await agent.run(full_message)
+        result = await agent.run(full_message, usage_limits=AGENT_USAGE_LIMITS)
 
         # Extract response - get the output property from RunResult
         if hasattr(result, 'output'):

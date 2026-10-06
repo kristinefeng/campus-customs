@@ -1,7 +1,7 @@
 # Campus Customs Full-Stack Harness Documentation
 
-**Status:** Production Ready (Problems 1-12 Complete)  
-**Date:** October 5, 2026
+**Status:** Problems 1-13 complete  
+**Last verified:** October 6, 2026
 
 ## Executive Summary
 
@@ -158,10 +158,10 @@ InventoryItem:
     "stop_reason": "success"
   },
   {
-    "timestamp": "2026-10-05T20:45:34.654321",
-    "tool": "check_availability",
-    "args_summary": "{'product_id': 'basic-hoodie-big-yale', 'size': 'L'}",
-    "result_summary": "Quantity: 8",
+    "timestamp": "2026-10-06T03:02:53.580576",
+    "tool": "get_product",
+    "args_summary": "{'product_id': 'basic-hoodie-big-yale'}",
+    "result_summary": "Retrieved: Basic Hoodie Big Yale",
     "stop_reason": "success"
   }
 ]
@@ -169,10 +169,12 @@ InventoryItem:
 
 ### What Gets Logged
 - **timestamp:** UTC ISO format (sortable, queryable)
-- **tool:** Tool name called (search_catalog, get_product, check_availability, browse_popular, chat, system)
+- **tool:** `search_catalog`, `get_product`, `check_availability`, `browse_popular`,
+  or `system` (the last records agent load/load-failure at startup)
 - **args_summary:** First 100 chars of arguments (prevents file bloat)
 - **result_summary:** First 100 chars of result (outcome tracking)
-- **stop_reason:** success | error | not_found | scope_violation | rate_limit | out_of_stock
+- **stop_reason:** `success`, `not_found` (get_product found no such product), or
+  `error` (check_availability returned an error, or the agent failed to load)
 
 ### Why Append-Only
 - Complete immutable history of all agent activity
@@ -205,7 +207,9 @@ InventoryItem:
 ### Backend (FastAPI/PydanticAI)
 - **Port:** localhost:8000
 - **Framework:** FastAPI (async)
-- **Database:** SQLite at ~/Downloads/data\ 2/campus_customs.db
+- **Database:** SQLite; path from `DATABASE_PATH` in `.env`
+  (falls back to `~/Downloads/data 2/campus_customs.db`)
+- **Product images:** served from `PRODUCTS_PATH` in `.env`
 - **Auth:** bcrypt password hashing (12 rounds)
 - **Agent:** OpenAI gpt-4o-mini via Portkey gateway
 - **Logging:** Audit trail to output/audit_trail.json
@@ -227,9 +231,8 @@ chat_messages (id, user_id, role, content, products_json, created_at)
 
 ### Agent Configuration
 - **Model:** OpenAI gpt-4o-mini via Portkey
-- **Max tokens:** 1000 per response
 - **Tools:** search_catalog, get_product, check_availability, browse_popular
-- **System Prompt:** prompts/prompt.md (237 lines with safety rules)
+- **System Prompt:** backend/prompts/prompt.md (284 lines, including the 7 safety rules)
 - **Context Injection:**
   ```
   [Customer: Sarah Chen (sarah@yale.edu)]
@@ -307,26 +310,44 @@ cat output/audit_trail.json | jq '.'
 
 ## Loop Limits & Result Caps
 
-- **Agent max tool calls:** 5 per request (prevent infinite loops)
-- **Search results:** 5 products per search_catalog call
-- **Response length:** 1000 tokens max
-- **Chat history:** 50 most recent messages per user
-- **Database query timeout:** 5 seconds
-- **SQLite pool:** 5 concurrent connections
+Enforced in code:
+
+| Cap | Value | Where |
+|---|---|---|
+| Agent tool calls per message | 20 | `AGENT_USAGE_LIMITS` in `backend/agent.py`, passed to `agent.run()` |
+| Agent output tokens per reply | 2000 | same `UsageLimits` object |
+| Results per `search_catalog` | 5 | `search_products(query, limit=5)` |
+| Results per `browse_popular` | 10 | `get_popular_products(limit=10)` |
+| Chat history reloaded on login | 50 most recent | `get_chat_history(user_id, limit=50)` |
+| Audit `args_summary` / `result_summary` | 100 chars each | `log_audit_trail()` |
+
+The tool-call cap is deliberately well above normal usage. One category question
+("do you have hoodies?") legitimately costs about 7 calls — a single
+`search_catalog` plus a `check_availability` per result — so 20 leaves headroom
+for ordinary multi-product conversations while still halting a runaway loop.
+Exceeding it raises `UsageLimitExceeded`, which `chat_with_agent()` catches and
+returns to the shopper as a failed `ChatResponse` rather than a crash.
+
+Not configured: there is no explicit SQLite query timeout and no connection pool.
+Each request opens its own short-lived `sqlite3.connect()` and closes it, which is
+adequate for a single-shop dataset of ~100 products but would need revisiting
+under real concurrency.
 
 ## Problem 12 Completion Checklist
 
 ✅ **Audit Trail**
 - Append-only JSON at output/audit_trail.json
-- All tool calls logged: timestamp, tool, args, result, stop_reason
-- Never cleared between runs (true append-only)
+- All four tools log: timestamp, tool, args, result, stop_reason
+- Never cleared between runs — verified by restarting the backend repeatedly
+  during testing and confirming the file only ever gained entries (0 deletions)
 - Enables compliance review and pattern detection
 
 ✅ **Safety Rules**
-- 7 mandatory rules added to system prompt (prompts/prompt.md)
+- 7 mandatory rules in the system prompt (backend/prompts/prompt.md)
 - Database-first authority enforced
 - Data privacy, scope boundaries, honesty all documented
-- Rate limiting, content integrity, user respect rules
+- Rule 6's soft rate-limiting guidance is backed by a hard `tool_calls_limit`
+  of 20 enforced in code, so a looping agent is stopped regardless of the prompt
 - Audit logging makes violations detectable
 
 ✅ **Harness Documentation**
@@ -338,6 +359,7 @@ cat output/audit_trail.json | jq '.'
 
 ---
 
-**System Status:** Production Ready  
-**Last Tested:** October 5, 2026  
-**Problems Complete:** 1-12 ✅
+**Last Tested:** October 6, 2026 — backend started with
+`uvicorn main:app --reload --port 8000` from `backend/`, served 102 catalogue
+products, and answered live stock and price questions from the database.  
+**Problems Complete:** 1-13 ✅

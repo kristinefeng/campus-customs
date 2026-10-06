@@ -1,7 +1,9 @@
-fastapi==0.104.1
-uvicorn==0.24.0
-pydantic==2.5.0
-pydantic-ai==0.0.5
-bcrypt==4.1.1
-python-dotenv==1.0.0
-aiohttp==3.9.1
+# Versions below are the ones this project was built and tested against.
+# pydantic-ai must be >=2.x -- the 0.x line is an entirely different API
+# and the agent in backend/agent.py will not import against it.
+fastapi>=0.142.0
+uvicorn>=0.53.0
+pydantic>=2.13.5
+pydantic-ai>=2.43.0
+bcrypt>=5.0.0
+python-dotenv>=1.2.3
